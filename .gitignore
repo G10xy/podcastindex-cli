@@ -1,0 +1,33 @@
+# Binaries
+podcastindex
+*.exe
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go
+vendor/
+*.test
+*.out
+go.work
+go.work.sum
+
+# Config with sensitive data
+config.yaml
+config.yml
+config.json
+
+# Test coverage
+coverage.out
+coverage.html
+
+# Debug
+debug
+*.log
