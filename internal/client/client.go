@@ -18,11 +18,11 @@ const (
 
 // Client is an HTTP client for the PodcastIndex API.
 type Client struct {
+	httpClient *http.Client
 	baseURL    string
 	apiKey     string
 	apiSecret  string
 	userAgent  string
-	httpClient *http.Client
 }
 
 // Option configures a Client.

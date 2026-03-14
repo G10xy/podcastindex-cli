@@ -11,28 +11,28 @@ type Transcript struct {
 }
 
 type Episode struct {
-	Title           string       `json:"title"`
-	Link            string       `json:"link"`
-	Description     string       `json:"description"`
-	GUID            string       `json:"guid"`
-	EnclosureURL    string       `json:"enclosureUrl"`
-	EnclosureType   string       `json:"enclosureType"`
+	EpisodeType     *string      `json:"episodeType"`
+	FeedItunesID    *int         `json:"feedItunesId"`
+	Season          *int         `json:"season"`
+	Episode         *int         `json:"episode"`
+	Duration        *int         `json:"duration"`
+	TranscriptURL   *string      `json:"transcriptUrl"`
+	ChaptersURL     *string      `json:"chaptersUrl"`
 	Image           string       `json:"image"`
-	FeedImage       string       `json:"feedImage"`
-	FeedURL         string       `json:"feedUrl"`
+	Description     string       `json:"description"`
 	FeedAuthor      string       `json:"feedAuthor"`
 	FeedTitle       string       `json:"feedTitle"`
 	FeedLanguage    string       `json:"feedLanguage"`
+	Link            string       `json:"link"`
+	FeedURL         string       `json:"feedUrl"`
+	GUID            string       `json:"guid"`
+	FeedImage       string       `json:"feedImage"`
+	Title           string       `json:"title"`
+	EnclosureType   string       `json:"enclosureType"`
+	EnclosureURL    string       `json:"enclosureUrl"`
 	Transcripts     []Transcript `json:"transcripts,omitempty"`
-	DatePublished   int64        `json:"datePublished"`
 	DateCrawled     int64        `json:"dateCrawled"`
-	EpisodeType     *string      `json:"episodeType"`
-	ChaptersURL     *string      `json:"chaptersUrl"`
-	TranscriptURL   *string      `json:"transcriptUrl"`
-	Duration        *int         `json:"duration"`
-	Episode         *int         `json:"episode"`
-	Season          *int         `json:"season"`
-	FeedItunesID    *int         `json:"feedItunesId"`
+	DatePublished   int64        `json:"datePublished"`
 	ID              int          `json:"id"`
 	EnclosureLength int          `json:"enclosureLength"`
 	FeedID          int          `json:"feedId"`
@@ -63,15 +63,15 @@ func (e Episode) TableRow() []string {
 }
 
 type EpisodesByFeedResponse struct {
-	APIResponse
-	Items []Episode         `json:"items"`
 	Query map[string]string `json:"query,omitempty"`
+	APIResponse
+	Items []Episode `json:"items"`
 }
 
 type EpisodeByIDResponse struct {
+	Query map[string]string `json:"query,omitempty"`
 	APIResponse
-	Episode Episode           `json:"episode"`
-	Query   map[string]string `json:"query,omitempty"`
+	Episode Episode `json:"episode"`
 }
 
 type EpisodesLiveResponse struct {

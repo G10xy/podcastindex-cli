@@ -5,13 +5,13 @@ import (
 )
 
 type ValueDestination struct {
+	CustomKey   *string `json:"customKey,omitempty"`
+	CustomValue *string `json:"customValue,omitempty"`
+	Fee         *bool   `json:"fee,omitempty"`
 	Name        string  `json:"name"`
 	Address     string  `json:"address"`
 	Type        string  `json:"type"`
-	CustomKey   *string `json:"customKey,omitempty"`
-	CustomValue *string `json:"customValue,omitempty"`
 	Split       int     `json:"split"`
-	Fee         *bool   `json:"fee,omitempty"`
 }
 
 func (v ValueDestination) TableHeaders() []string {
@@ -33,9 +33,9 @@ func (v ValueDestination) TableRow() []string {
 }
 
 type ValueModel struct {
+	Suggested *string `json:"suggested,omitempty"`
 	Type      string  `json:"type"`
 	Method    string  `json:"method"`
-	Suggested *string `json:"suggested,omitempty"`
 }
 
 type Value struct {
@@ -44,9 +44,9 @@ type Value struct {
 }
 
 type ValueByFeedResponse struct {
-	APIResponse
-	Value Value             `json:"value"`
 	Query map[string]string `json:"query,omitempty"`
+	Value Value             `json:"value"`
+	APIResponse
 }
 
 type ValueByEpisodeGUIDResponse struct {
@@ -55,6 +55,6 @@ type ValueByEpisodeGUIDResponse struct {
 }
 
 type ValueBatchByEpisodeGUIDResponse struct {
-	APIResponse
 	Items map[string]interface{} `json:"items"`
+	APIResponse
 }

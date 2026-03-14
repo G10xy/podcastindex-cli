@@ -6,13 +6,13 @@ import (
 )
 
 type PersonResult struct {
-	Title           string `json:"title"`
-	Link            string `json:"link"`
-	Description     string `json:"description"`
-	GUID            string `json:"guid"`
-	EnclosureURL    string `json:"enclosureUrl"`
-	EnclosureType   string `json:"enclosureType"`
+	Duration        *int   `json:"duration"`
+	FeedItunesID    *int   `json:"feedItunesId"`
+	Season          *int   `json:"season"`
+	Episode         *int   `json:"episode"`
 	EpisodeType     string `json:"episodeType"`
+	Link            string `json:"link"`
+	Title           string `json:"title"`
 	Image           string `json:"image"`
 	FeedImage       string `json:"feedImage"`
 	FeedURL         string `json:"feedUrl"`
@@ -21,12 +21,12 @@ type PersonResult struct {
 	FeedLanguage    string `json:"feedLanguage"`
 	ChaptersURL     string `json:"chaptersUrl"`
 	TranscriptURL   string `json:"transcriptUrl"`
-	DatePublished   int64  `json:"datePublished"`
+	EnclosureType   string `json:"enclosureType"`
+	Description     string `json:"description"`
+	EnclosureURL    string `json:"enclosureUrl"`
+	GUID            string `json:"guid"`
 	DateCrawled     int64  `json:"dateCrawled"`
-	Duration        *int   `json:"duration"`
-	Episode         *int   `json:"episode"`
-	Season          *int   `json:"season"`
-	FeedItunesID    *int   `json:"feedItunesId"`
+	DatePublished   int64  `json:"datePublished"`
 	ID              int    `json:"id"`
 	EnclosureLength int    `json:"enclosureLength"`
 	FeedID          int    `json:"feedId"`
@@ -52,7 +52,7 @@ func (p PersonResult) TableRow() []string {
 }
 
 type SearchByPersonResponse struct {
+	Query string `json:"query"`
 	APIResponse
 	Items []PersonResult `json:"items"`
-	Query string         `json:"query"`
 }

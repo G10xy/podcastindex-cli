@@ -7,28 +7,28 @@ import (
 )
 
 type Feed struct {
-	PodcastGUID            string            `json:"podcastGuid"`
-	Title                  string            `json:"title"`
-	URL                    string            `json:"url"`
-	OriginalURL            string            `json:"originalUrl"`
+	ItunesID               *int              `json:"itunesId"`
+	Categories             map[string]string `json:"categories"`
+	OwnerName              string            `json:"ownerName"`
+	Artwork                string            `json:"artwork"`
 	Link                   string            `json:"link"`
 	Description            string            `json:"description"`
 	Author                 string            `json:"author"`
-	OwnerName              string            `json:"ownerName"`
+	PodcastGUID            string            `json:"podcastGuid"`
 	Image                  string            `json:"image"`
-	Artwork                string            `json:"artwork"`
+	OriginalURL            string            `json:"originalUrl"`
 	ContentType            string            `json:"contentType"`
 	Generator              string            `json:"generator"`
 	Language               string            `json:"language"`
 	Medium                 string            `json:"medium"`
-	Categories             map[string]string `json:"categories"`
-	LastUpdateTime         int64             `json:"lastUpdateTime"`
+	Title                  string            `json:"title"`
+	URL                    string            `json:"url"`
 	LastCrawlTime          int64             `json:"lastCrawlTime"`
 	LastParseTime          int64             `json:"lastParseTime"`
-	LastGoodHttpStatusTime int64             `json:"lastGoodHttpStatusTime"`
+	LastUpdateTime         int64             `json:"lastUpdateTime"`
 	ImageURLHash           int64             `json:"imageUrlHash"`
 	NewestItemPubdate      int64             `json:"newestItemPubdate"`
-	ItunesID               *int              `json:"itunesId"`
+	LastGoodHttpStatusTime int64             `json:"lastGoodHttpStatusTime"`
 	ID                     int               `json:"id"`
 	LastHttpStatus         int               `json:"lastHttpStatus"`
 	Type                   int               `json:"type"`
@@ -60,9 +60,9 @@ func (f Feed) TableRow() []string {
 }
 
 type PodcastByFeedResponse struct {
-	APIResponse
-	Feed  Feed              `json:"feed"`
 	Query map[string]string `json:"query"`
+	APIResponse
+	Feed Feed `json:"feed"`
 }
 
 type PodcastsByTagResponse struct {
@@ -93,9 +93,9 @@ type PodcastsBatchByGUIDResponse struct {
 }
 
 type SearchByTermResponse struct {
+	Query string `json:"query"`
 	APIResponse
 	Feeds []Feed `json:"feeds"`
-	Query string `json:"query"`
 }
 
 func formatDuration(seconds *int) string {
