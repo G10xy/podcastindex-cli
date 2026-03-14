@@ -1,5 +1,5 @@
 # Binaries
-podcastindex
+/podcastindex
 *.exe
 dist/
 
@@ -33,5 +33,4 @@ debug
 *.log
 
 
-api-doc.yml
 agents.md
