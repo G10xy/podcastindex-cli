@@ -126,3 +126,30 @@ func addBoolFlag(params url.Values, key string, val bool) {
 		params.Set(key, "")
 	}
 }
+
+// get performs an authenticated GET and decodes the response into T.
+func get[T any](c *Client, ctx context.Context, path string, params url.Values) (*T, error) {
+	return do[T](c, ctx, "GET", path, params, nil, true)
+}
+
+// getNoAuth performs an unauthenticated GET and decodes the response into T.
+func getNoAuth[T any](c *Client, ctx context.Context, path string, params url.Values) (*T, error) {
+	return do[T](c, ctx, "GET", path, params, nil, false)
+}
+
+// post performs an authenticated POST and decodes the response into T.
+func post[T any](c *Client, ctx context.Context, path string, body io.Reader) (*T, error) {
+	return do[T](c, ctx, "POST", path, nil, body, true)
+}
+
+func do[T any](c *Client, ctx context.Context, method, path string, params url.Values, body io.Reader, authenticated bool) (*T, error) {
+	resp, err := c.doRequest(ctx, method, path, params, body, authenticated)
+	if err != nil {
+		return nil, err
+	}
+	var result T
+	if err := c.decodeResponse(resp, &result); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
