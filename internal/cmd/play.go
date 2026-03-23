@@ -29,7 +29,12 @@ var playCmd = &cobra.Command{
 		if player == "" {
 			player = viper.GetString("player")
 		}
-		if player == "" {
+		if player != "" {
+			player, err = media.ResolvePlayer(player)
+			if err != nil {
+				return err
+			}
+		} else {
 			player, err = media.DetectPlayer()
 			if err != nil {
 				return err

@@ -27,10 +27,15 @@ type BatchResult struct {
 	Errors     []error
 }
 
+const maxWorkers = 20
+
 // BatchDownload downloads multiple episodes concurrently using bounded parallelism.
 func BatchDownload(ctx context.Context, httpClient *http.Client, opts BatchDownloadOptions) (*BatchResult, error) {
 	if opts.Workers <= 0 {
 		opts.Workers = 3
+	}
+	if opts.Workers > maxWorkers {
+		opts.Workers = maxWorkers
 	}
 
 	total := len(opts.Episodes)
@@ -54,7 +59,12 @@ func BatchDownload(ctx context.Context, httpClient *http.Client, opts BatchDownl
 		}
 
 		wg.Add(1)
-		sem <- struct{}{} // acquire slot
+		select {
+		case sem <- struct{}{}: // acquire slot
+		case <-ctx.Done():
+			wg.Done()
+			continue
+		}
 
 		go func(episode models.Episode) {
 			defer wg.Done()
@@ -92,7 +102,7 @@ func BatchDownload(ctx context.Context, httpClient *http.Client, opts BatchDownl
 			totalBytes.Add(size)
 
 			if opts.Output != nil {
-				fmt.Fprintf(opts.Output, "[%d/%d] Downloaded %q (%s)\n", n, total, episode.Title, formatBytes(size))
+				fmt.Fprintf(opts.Output, "[%d/%d] Downloaded %q (%s)\n", n, total, episode.Title, FormatBytes(size))
 			}
 		}(ep)
 	}

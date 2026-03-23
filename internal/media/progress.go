@@ -29,22 +29,26 @@ func (pw *progressWriter) Write(p []byte) (int, error) {
 
 	if pw.output != nil {
 		elapsed := time.Since(pw.startTime).Seconds()
+		if elapsed < 0.001 {
+			elapsed = 0.001
+		}
 		speed := float64(pw.written) / elapsed / (1024 * 1024) // MB/s
 
 		if pw.total > 0 {
 			pct := float64(pw.written) / float64(pw.total) * 100
 			fmt.Fprintf(pw.output, "\r  %s / %s (%.0f%%) %.1f MB/s",
-				formatBytes(pw.written), formatBytes(pw.total), pct, speed)
+				FormatBytes(pw.written), FormatBytes(pw.total), pct, speed)
 		} else {
 			fmt.Fprintf(pw.output, "\r  %s downloaded  %.1f MB/s",
-				formatBytes(pw.written), speed)
+				FormatBytes(pw.written), speed)
 		}
 	}
 
 	return n, err
 }
 
-func formatBytes(b int64) string {
+// FormatBytes formats a byte count as a human-readable string.
+func FormatBytes(b int64) string {
 	const (
 		kb = 1024
 		mb = kb * 1024

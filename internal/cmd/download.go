@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -12,6 +13,16 @@ import (
 	"github.com/G10xy/podcastindex-cli/internal/media"
 	"github.com/G10xy/podcastindex-cli/pkg/models"
 )
+
+// downloadHTTPClient returns an HTTP client with reasonable timeouts for downloads.
+func downloadHTTPClient() *http.Client {
+	return &http.Client{
+		Timeout: 30 * time.Minute,
+		Transport: &http.Transport{
+			ResponseHeaderTimeout: 30 * time.Second,
+		},
+	}
+}
 
 var downloadCmd = &cobra.Command{
 	Use:   "download",
@@ -38,7 +49,7 @@ func init() {
 	downloadCmd.Flags().Int("feedid", 0, "Feed ID (used with --all)")
 	downloadCmd.Flags().String("feedurl", "", "Feed URL (used with --all)")
 	downloadCmd.Flags().String("podcastguid", "", "Podcast GUID (used with --all)")
-	downloadCmd.Flags().Int("workers", 3, "Number of concurrent downloads (used with --all)")
+	downloadCmd.Flags().Int("workers", 3, "Number of concurrent downloads, max 20 (used with --all)")
 
 	// Output flags
 	downloadCmd.Flags().String("dir", ".", "Output directory")
@@ -61,7 +72,7 @@ func runSingleDownload(cmd *cobra.Command) error {
 		fmt.Fprintf(os.Stderr, "Downloading %q...\n", title)
 	}
 
-	dest, err := media.Download(cmd.Context(), http.DefaultClient, media.DownloadOptions{
+	dest, err := media.Download(cmd.Context(), downloadHTTPClient(), media.DownloadOptions{
 		URL:      enclosureURL,
 		Dir:      mustString(cmd, "dir"),
 		Filename: mustString(cmd, "filename"),
@@ -103,7 +114,7 @@ func runBatchDownload(cmd *cobra.Command) error {
 
 	fmt.Fprintf(os.Stderr, "Downloading %d episodes to %s (workers: %d)...\n", len(episodes), dir, workers)
 
-	result, err := media.BatchDownload(ctx, http.DefaultClient, media.BatchDownloadOptions{
+	result, err := media.BatchDownload(ctx, downloadHTTPClient(), media.BatchDownloadOptions{
 		Episodes: episodes,
 		Dir:      dir,
 		Workers:  workers,
@@ -114,11 +125,15 @@ func runBatchDownload(cmd *cobra.Command) error {
 	}
 
 	fmt.Fprintf(os.Stderr, "\nDone. Downloaded %d episodes (%s total)",
-		result.TotalFiles, formatBytesForSummary(result.TotalBytes))
+		result.TotalFiles, media.FormatBytes(result.TotalBytes))
 	if len(result.Errors) > 0 {
 		fmt.Fprintf(os.Stderr, ", %d failed", len(result.Errors))
 	}
 	fmt.Fprintln(os.Stderr)
+
+	if len(result.Errors) > 0 {
+		return fmt.Errorf("%d episode(s) failed to download", len(result.Errors))
+	}
 
 	return nil
 }
@@ -157,22 +172,4 @@ func fetchAllEpisodes(ctx context.Context, c *client.Client, feedID int, feedURL
 	}
 
 	return nil, fmt.Errorf("one of --feedid, --feedurl, or --podcastguid is required")
-}
-
-func formatBytesForSummary(b int64) string {
-	const (
-		kb = 1024
-		mb = kb * 1024
-		gb = mb * 1024
-	)
-	switch {
-	case b >= gb:
-		return fmt.Sprintf("%.1f GB", float64(b)/float64(gb))
-	case b >= mb:
-		return fmt.Sprintf("%.1f MB", float64(b)/float64(mb))
-	case b >= kb:
-		return fmt.Sprintf("%.1f KB", float64(b)/float64(kb))
-	default:
-		return fmt.Sprintf("%d B", b)
-	}
 }
