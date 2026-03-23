@@ -22,6 +22,7 @@ var configShowCmd = &cobra.Command{
 			"api_key":       viper.GetString("api_key"),
 			"api_secret":    maskSecret(viper.GetString("api_secret")),
 			"output_format": viper.GetString("output_format"),
+			"player":        viper.GetString("player"),
 		}
 		for k, v := range settings {
 			fmt.Fprintf(os.Stdout, "%s: %v\n", k, v)
@@ -33,15 +34,15 @@ var configShowCmd = &cobra.Command{
 var configSetCmd = &cobra.Command{
 	Use:   "set <key> <value>",
 	Short: "Set a configuration value",
-	Long:  "Supported keys: api_key, api_secret, output_format",
+	Long:  "Supported keys: api_key, api_secret, output_format, player",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key, value := args[0], args[1]
 
 		switch key {
-		case "api_key", "api_secret", "output_format":
+		case "api_key", "api_secret", "output_format", "player":
 		default:
-			return fmt.Errorf("unsupported config key %q. Supported: api_key, api_secret, output_format", key)
+			return fmt.Errorf("unsupported config key %q. Supported: api_key, api_secret, output_format, player", key)
 		}
 
 		viper.Set(key, value)
