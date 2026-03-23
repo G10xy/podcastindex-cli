@@ -7,7 +7,7 @@ import (
 )
 
 type Feed struct {
-	ItunesID               *int              `json:"itunesId"`
+		ItunesID               *int              `json:"itunesId"`
 	Categories             map[string]string `json:"categories"`
 	OwnerName              string            `json:"ownerName"`
 	Artwork                string            `json:"artwork"`
