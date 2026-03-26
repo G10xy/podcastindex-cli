@@ -3,12 +3,13 @@ package client
 import (
 	"context"
 	"net/http"
-	"net/http/httptest"
 	"testing"
+
+	"github.com/G10xy/podcastindex-cli/internal/testutil"
 )
 
 func TestAddByFeedURL(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := testutil.NewTestServerFunc(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/add/byfeedurl" {
 			t.Errorf("path = %q", r.URL.Path)
 		}
@@ -18,9 +19,8 @@ func TestAddByFeedURL(t *testing.T) {
 		if r.URL.Query().Get("chash") != "abc123" {
 			t.Errorf("chash = %q, want abc123", r.URL.Query().Get("chash"))
 		}
-		w.Write([]byte(`{"status":"true","description":"Feed added","feedId":12345}`))
-	}))
-	defer srv.Close()
+		w.Write(testutil.LoadFixture(t, "add_byfeedurl.json"))
+	})
 
 	c := NewClient("key", "secret", WithBaseURL(srv.URL))
 	result, err := c.AddByFeedURL(context.Background(), AddByFeedURLOptions{
@@ -36,13 +36,12 @@ func TestAddByFeedURL(t *testing.T) {
 }
 
 func TestAddByItunesID(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := testutil.NewTestServerFunc(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("id") != "1441923632" {
 			t.Errorf("id = %q, want 1441923632", r.URL.Query().Get("id"))
 		}
 		w.Write([]byte(`{"status":"true","description":"Feed added","feedId":67890}`))
-	}))
-	defer srv.Close()
+	})
 
 	c := NewClient("key", "secret", WithBaseURL(srv.URL))
 	result, err := c.AddByItunesID(context.Background(), 1441923632)

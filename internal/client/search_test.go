@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/G10xy/podcastindex-cli/internal/testutil"
 )
 
 func TestSearchByTerm(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := testutil.NewTestServerFunc(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/search/byterm" {
 			t.Errorf("path = %q, want /search/byterm", r.URL.Path)
 		}
@@ -21,9 +23,8 @@ func TestSearchByTerm(t *testing.T) {
 		if r.Header.Get("X-Auth-Key") == "" {
 			t.Error("expected auth headers")
 		}
-		w.Write([]byte(`{"status":"true","feeds":[{"id":75075,"title":"Batman University"}],"count":1,"query":"batman"}`))
-	}))
-	defer srv.Close()
+		w.Write(testutil.LoadFixture(t, "search_byterm.json"))
+	})
 
 	c := NewClient("key", "secret", WithBaseURL(srv.URL))
 	result, err := c.SearchByTerm(context.Background(), SearchByTermOptions{
@@ -42,7 +43,7 @@ func TestSearchByTerm(t *testing.T) {
 }
 
 func TestSearchByTitle(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := testutil.NewTestServerFunc(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/search/bytitle" {
 			t.Errorf("path = %q, want /search/bytitle", r.URL.Path)
 		}
@@ -50,8 +51,7 @@ func TestSearchByTitle(t *testing.T) {
 			t.Errorf("q = %q, want daily", q)
 		}
 		w.Write([]byte(`{"status":"true","feeds":[{"id":1,"title":"Everything Everywhere Daily"}],"count":1}`))
-	}))
-	defer srv.Close()
+	})
 
 	c := NewClient("key", "secret", WithBaseURL(srv.URL))
 	result, err := c.SearchByTitle(context.Background(), SearchByTitleOptions{Query: "daily"})
@@ -64,13 +64,12 @@ func TestSearchByTitle(t *testing.T) {
 }
 
 func TestSearchByPerson(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := testutil.NewTestServerFunc(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/search/byperson" {
 			t.Errorf("path = %q, want /search/byperson", r.URL.Path)
 		}
 		w.Write([]byte(`{"status":"true","items":[{"id":100,"title":"Episode 1","feedTitle":"Some Podcast"}],"count":1}`))
-	}))
-	defer srv.Close()
+	})
 
 	c := NewClient("key", "secret", WithBaseURL(srv.URL))
 	result, err := c.SearchByPerson(context.Background(), SearchByPersonOptions{Query: "adam curry", Max: 5})
@@ -86,7 +85,7 @@ func TestSearchByPerson(t *testing.T) {
 }
 
 func TestSearchMusicByTerm(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := testutil.NewTestServerFunc(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/search/music/byterm" {
 			t.Errorf("path = %q, want /search/music/byterm", r.URL.Path)
 		}
@@ -94,8 +93,7 @@ func TestSearchMusicByTerm(t *testing.T) {
 			t.Error("expected aponly param")
 		}
 		w.Write([]byte(`{"status":"true","feeds":[{"id":200,"title":"Indie Music"}],"count":1}`))
-	}))
-	defer srv.Close()
+	})
 
 	c := NewClient("key", "secret", WithBaseURL(srv.URL))
 	result, err := c.SearchMusicByTerm(context.Background(), SearchMusicByTermOptions{
