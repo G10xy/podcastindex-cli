@@ -19,11 +19,7 @@ var podcastsByFeedIDCmd = &cobra.Command{
 	Use:   "byfeedid",
 	Short: "Get podcast by PodcastIndex Feed ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		id := mustInt(cmd, "id")
-		if id == 0 {
-			return fmt.Errorf("--id is required")
-		}
-		result, err := newClient().PodcastByFeedID(cmd.Context(), id)
+		result, err := newClient().PodcastByFeedID(cmd.Context(), mustInt(cmd, "id"))
 		if err != nil {
 			return err
 		}
@@ -35,11 +31,7 @@ var podcastsByFeedURLCmd = &cobra.Command{
 	Use:   "byfeedurl",
 	Short: "Get podcast by feed URL",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		u := mustString(cmd, "url")
-		if u == "" {
-			return fmt.Errorf("--url is required")
-		}
-		result, err := newClient().PodcastByFeedURL(cmd.Context(), u)
+		result, err := newClient().PodcastByFeedURL(cmd.Context(), mustString(cmd, "url"))
 		if err != nil {
 			return err
 		}
@@ -51,11 +43,7 @@ var podcastsByItunesIDCmd = &cobra.Command{
 	Use:   "byitunesid",
 	Short: "Get podcast by iTunes ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		id := mustInt(cmd, "id")
-		if id == 0 {
-			return fmt.Errorf("--id is required")
-		}
-		result, err := newClient().PodcastByItunesID(cmd.Context(), id)
+		result, err := newClient().PodcastByItunesID(cmd.Context(), mustInt(cmd, "id"))
 		if err != nil {
 			return err
 		}
@@ -67,11 +55,7 @@ var podcastsByGUIDCmd = &cobra.Command{
 	Use:   "byguid",
 	Short: "Get podcast by GUID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		guid := mustString(cmd, "guid")
-		if guid == "" {
-			return fmt.Errorf("--guid is required")
-		}
-		result, err := newClient().PodcastByGUID(cmd.Context(), guid)
+		result, err := newClient().PodcastByGUID(cmd.Context(), mustString(cmd, "guid"))
 		if err != nil {
 			return err
 		}
@@ -105,12 +89,8 @@ var podcastsByMediumCmd = &cobra.Command{
 	Use:   "bymedium",
 	Short: "Get podcasts by medium type",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		medium := mustString(cmd, "medium")
-		if medium == "" {
-			return fmt.Errorf("--medium is required")
-		}
 		result, err := newClient().PodcastsByMedium(cmd.Context(), client.PodcastsByMediumOptions{
-			Medium: medium,
+			Medium: mustString(cmd, "medium"),
 			Max:    mustInt(cmd, "max"),
 		})
 		if err != nil {
@@ -154,11 +134,7 @@ var podcastsBatchCmd = &cobra.Command{
 	Use:   "batch",
 	Short: "Batch get podcasts by GUIDs",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		raw := mustString(cmd, "guids")
-		if raw == "" {
-			return fmt.Errorf("--guids is required")
-		}
-		guids := strings.Split(raw, ",")
+		guids := strings.Split(mustString(cmd, "guids"), ",")
 		result, err := newClient().PodcastsBatchByGUID(cmd.Context(), guids)
 		if err != nil {
 			return err
@@ -171,9 +147,13 @@ func init() {
 	rootCmd.AddCommand(podcastsCmd)
 
 	podcastsByFeedIDCmd.Flags().Int("id", 0, "PodcastIndex Feed ID (required)")
+	podcastsByFeedIDCmd.MarkFlagRequired("id")
 	podcastsByFeedURLCmd.Flags().String("url", "", "Podcast feed URL (required)")
+	podcastsByFeedURLCmd.MarkFlagRequired("url")
 	podcastsByItunesIDCmd.Flags().Int("id", 0, "iTunes ID (required)")
+	podcastsByItunesIDCmd.MarkFlagRequired("id")
 	podcastsByGUIDCmd.Flags().String("guid", "", "Podcast GUID (required)")
+	podcastsByGUIDCmd.MarkFlagRequired("guid")
 
 	podcastsByTagCmd.Flags().Bool("podcast-value", false, "Feeds supporting podcast:value tag")
 	podcastsByTagCmd.Flags().Bool("podcast-value-time-split", false, "Feeds supporting podcast:valueTimeSplit tag")
@@ -181,6 +161,7 @@ func init() {
 	podcastsByTagCmd.Flags().Int("start-at", 0, "Feed ID to start at for pagination")
 
 	podcastsByMediumCmd.Flags().String("medium", "", "Medium type: audiobook, blog, film, music, newsletter, podcast, video (required)")
+	podcastsByMediumCmd.MarkFlagRequired("medium")
 	podcastsByMediumCmd.Flags().Int("max", 0, "Maximum number of results")
 
 	podcastsTrendingCmd.Flags().Int("max", 0, "Maximum number of results")
@@ -190,6 +171,7 @@ func init() {
 	podcastsTrendingCmd.Flags().String("notcat", "", "Exclude categories (comma-separated)")
 
 	podcastsBatchCmd.Flags().String("guids", "", "Comma-separated podcast GUIDs (required)")
+	podcastsBatchCmd.MarkFlagRequired("guids")
 
 	for _, c := range []*cobra.Command{
 		podcastsByFeedIDCmd, podcastsByFeedURLCmd, podcastsByItunesIDCmd,

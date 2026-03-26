@@ -17,11 +17,7 @@ var valueByFeedIDCmd = &cobra.Command{
 	Use:   "byfeedid",
 	Short: "Value info by Feed ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		id := mustInt(cmd, "id")
-		if id == 0 {
-			return fmt.Errorf("--id is required")
-		}
-		result, err := newClient().ValueByFeedID(cmd.Context(), id)
+		result, err := newClient().ValueByFeedID(cmd.Context(), mustInt(cmd, "id"))
 		if err != nil {
 			return err
 		}
@@ -33,11 +29,7 @@ var valueByFeedURLCmd = &cobra.Command{
 	Use:   "byfeedurl",
 	Short: "Value info by feed URL",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		u := mustString(cmd, "url")
-		if u == "" {
-			return fmt.Errorf("--url is required")
-		}
-		result, err := newClient().ValueByFeedURL(cmd.Context(), u)
+		result, err := newClient().ValueByFeedURL(cmd.Context(), mustString(cmd, "url"))
 		if err != nil {
 			return err
 		}
@@ -49,11 +41,7 @@ var valueByPodcastGUIDCmd = &cobra.Command{
 	Use:   "bypodcastguid",
 	Short: "Value info by Podcast GUID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		guid := mustString(cmd, "guid")
-		if guid == "" {
-			return fmt.Errorf("--guid is required")
-		}
-		result, err := newClient().ValueByPodcastGUID(cmd.Context(), guid)
+		result, err := newClient().ValueByPodcastGUID(cmd.Context(), mustString(cmd, "guid"))
 		if err != nil {
 			return err
 		}
@@ -65,12 +53,7 @@ var valueByEpisodeGUIDCmd = &cobra.Command{
 	Use:   "byepisodeguid",
 	Short: "Value info by episode GUID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		pg := mustString(cmd, "podcastguid")
-		eg := mustString(cmd, "episodeguid")
-		if pg == "" || eg == "" {
-			return fmt.Errorf("--podcastguid and --episodeguid are required")
-		}
-		result, err := newClient().ValueByEpisodeGUID(cmd.Context(), pg, eg)
+		result, err := newClient().ValueByEpisodeGUID(cmd.Context(), mustString(cmd, "podcastguid"), mustString(cmd, "episodeguid"))
 		if err != nil {
 			return err
 		}
@@ -117,11 +100,16 @@ func init() {
 	rootCmd.AddCommand(valueCmd)
 
 	valueByFeedIDCmd.Flags().Int("id", 0, "Feed ID (required)")
+	valueByFeedIDCmd.MarkFlagRequired("id")
 	valueByFeedURLCmd.Flags().String("url", "", "Feed URL (required)")
+	valueByFeedURLCmd.MarkFlagRequired("url")
 	valueByPodcastGUIDCmd.Flags().String("guid", "", "Podcast GUID (required)")
+	valueByPodcastGUIDCmd.MarkFlagRequired("guid")
 
 	valueByEpisodeGUIDCmd.Flags().String("podcastguid", "", "Podcast GUID (required)")
+	valueByEpisodeGUIDCmd.MarkFlagRequired("podcastguid")
 	valueByEpisodeGUIDCmd.Flags().String("episodeguid", "", "Episode GUID (required)")
+	valueByEpisodeGUIDCmd.MarkFlagRequired("episodeguid")
 
 	valueBatchCmd.Flags().String("data", "", "Inline JSON: {\"podcastGUID\":[\"epGUID1\",\"epGUID2\"]}")
 	valueBatchCmd.Flags().String("file", "", "Path to JSON file with batch input")

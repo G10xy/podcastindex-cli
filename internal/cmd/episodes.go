@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/G10xy/podcastindex-cli/internal/client"
@@ -18,12 +16,8 @@ var episodesByFeedIDCmd = &cobra.Command{
 	Use:   "byfeedid",
 	Short: "Get episodes by Feed ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		id := mustString(cmd, "id")
-		if id == "" {
-			return fmt.Errorf("--id is required")
-		}
 		result, err := newClient().EpisodesByFeedID(cmd.Context(), client.EpisodesByFeedIDOptions{
-			ID:        id,
+			ID:        mustString(cmd, "id"),
 			Since:     mustInt64(cmd, "since"),
 			Max:       mustInt(cmd, "max"),
 			Enclosure: mustString(cmd, "enclosure"),
@@ -41,12 +35,8 @@ var episodesByFeedURLCmd = &cobra.Command{
 	Use:   "byfeedurl",
 	Short: "Get episodes by feed URL",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		u := mustString(cmd, "url")
-		if u == "" {
-			return fmt.Errorf("--url is required")
-		}
 		result, err := newClient().EpisodesByFeedURL(cmd.Context(), client.EpisodesByFeedURLOptions{
-			URL:      u,
+			URL:      mustString(cmd, "url"),
 			Since:    mustInt64(cmd, "since"),
 			Max:      mustInt(cmd, "max"),
 			FullText: mustBool(cmd, "fulltext"),
@@ -62,12 +52,8 @@ var episodesByPodcastGUIDCmd = &cobra.Command{
 	Use:   "bypodcastguid",
 	Short: "Get episodes by Podcast GUID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		guid := mustString(cmd, "guid")
-		if guid == "" {
-			return fmt.Errorf("--guid is required")
-		}
 		result, err := newClient().EpisodesByPodcastGUID(cmd.Context(), client.EpisodesByPodcastGUIDOptions{
-			GUID:     guid,
+			GUID:     mustString(cmd, "guid"),
 			Since:    mustInt64(cmd, "since"),
 			Max:      mustInt(cmd, "max"),
 			FullText: mustBool(cmd, "fulltext"),
@@ -83,12 +69,8 @@ var episodesByItunesIDCmd = &cobra.Command{
 	Use:   "byitunesid",
 	Short: "Get episodes by iTunes ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		id := mustInt(cmd, "id")
-		if id == 0 {
-			return fmt.Errorf("--id is required")
-		}
 		result, err := newClient().EpisodesByItunesID(cmd.Context(), client.EpisodesByItunesIDOptions{
-			ID:        id,
+			ID:        mustInt(cmd, "id"),
 			Since:     mustInt64(cmd, "since"),
 			Max:       mustInt(cmd, "max"),
 			Enclosure: mustString(cmd, "enclosure"),
@@ -105,11 +87,7 @@ var episodesByIDCmd = &cobra.Command{
 	Use:   "byid",
 	Short: "Get single episode by ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		id := mustInt(cmd, "id")
-		if id == 0 {
-			return fmt.Errorf("--id is required")
-		}
-		result, err := newClient().EpisodeByID(cmd.Context(), id, mustBool(cmd, "fulltext"))
+		result, err := newClient().EpisodeByID(cmd.Context(), mustInt(cmd, "id"), mustBool(cmd, "fulltext"))
 		if err != nil {
 			return err
 		}
@@ -121,12 +99,8 @@ var episodesByGUIDCmd = &cobra.Command{
 	Use:   "byguid",
 	Short: "Get single episode by GUID",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		guid := mustString(cmd, "guid")
-		if guid == "" {
-			return fmt.Errorf("--guid is required")
-		}
 		result, err := newClient().EpisodeByGUID(cmd.Context(), client.EpisodeByGUIDOptions{
-			GUID:        guid,
+			GUID:        mustString(cmd, "guid"),
 			FeedURL:     mustString(cmd, "feedurl"),
 			FeedID:      mustString(cmd, "feedid"),
 			PodcastGUID: mustString(cmd, "podcastguid"),
@@ -180,20 +154,26 @@ func init() {
 	}
 
 	episodesByFeedIDCmd.Flags().String("id", "", "Feed ID or comma-separated IDs (required)")
+	episodesByFeedIDCmd.MarkFlagRequired("id")
 	episodesByFeedIDCmd.Flags().String("enclosure", "", "Filter by enclosure URL")
 	episodesByFeedIDCmd.Flags().Bool("newest", false, "Only most recent episode per feed")
 
 	episodesByFeedURLCmd.Flags().String("url", "", "Feed URL (required)")
+	episodesByFeedURLCmd.MarkFlagRequired("url")
 
 	episodesByPodcastGUIDCmd.Flags().String("guid", "", "Podcast GUID (required)")
+	episodesByPodcastGUIDCmd.MarkFlagRequired("guid")
 
 	episodesByItunesIDCmd.Flags().Int("id", 0, "iTunes Feed ID (required)")
+	episodesByItunesIDCmd.MarkFlagRequired("id")
 	episodesByItunesIDCmd.Flags().String("enclosure", "", "Filter by enclosure URL")
 
 	episodesByIDCmd.Flags().Int("id", 0, "Episode ID (required)")
+	episodesByIDCmd.MarkFlagRequired("id")
 	episodesByIDCmd.Flags().Bool("fulltext", false, "Return full text description")
 
 	episodesByGUIDCmd.Flags().String("guid", "", "Episode GUID (required)")
+	episodesByGUIDCmd.MarkFlagRequired("guid")
 	episodesByGUIDCmd.Flags().String("feedurl", "", "Feed URL")
 	episodesByGUIDCmd.Flags().String("feedid", "", "Feed ID")
 	episodesByGUIDCmd.Flags().String("podcastguid", "", "Podcast GUID")
