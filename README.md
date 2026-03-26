@@ -2,11 +2,36 @@
 
 CLI for interfacing with the [PodcastIndex.org](https://podcastindex.org/) API.
 
+## Quick Start
+
+```bash
+# Install
+go install github.com/G10xy/podcastindex-cli/cmd/podcastindex@latest
+
+# Configure your API credentials (get them at https://api.podcastindex.org/)
+podcastindex config set api_key <your-key>
+podcastindex config set api_secret <your-secret>
+
+# Search for a podcast
+podcastindex search byterm -q "linux"
+
+# Get episodes from a feed
+podcastindex episodes byfeedid --id 75075
+
+# Play an episode
+podcastindex play --id 12345
+
+# Download an episode
+podcastindex download --id 12345 --dir ~/podcasts
+```
+
 ## Installation
 
 ```bash
 go install github.com/G10xy/podcastindex-cli/cmd/podcastindex@latest
 ```
+
+Or download a pre-built binary from the [releases page](https://github.com/G10xy/podcastindex-cli/releases).
 
 ## Configuration
 
@@ -86,9 +111,10 @@ podcastindex
 │   └── current         Get current stats
 ├── hub
 │   └── pubnotify       Send a PubSub notification
-└── config
-    ├── show            Show current configuration
-    └── set             Set a configuration value
+├── config
+│   ├── show            Show current configuration
+│   └── set             Set a configuration value
+└── version             Print the CLI version
 ```
 
 ## Documentation
@@ -96,6 +122,20 @@ podcastindex
 - [add](docs/add.md) — Add podcasts to the index
 - [play](docs/play.md) — Stream episodes to a media player
 - [download](docs/download.md) — Download episode audio files
+
+## Contributing
+
+```bash
+# Clone the repository
+git clone https://github.com/G10xy/podcastindex-cli.git
+cd podcastindex-cli
+
+# Run tests
+go test ./...
+
+# Build
+go build -o podcastindex ./cmd/podcastindex
+```
 
 ## License
 
