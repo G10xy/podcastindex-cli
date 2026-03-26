@@ -53,6 +53,14 @@ func BatchDownload(ctx context.Context, httpClient *http.Client, opts BatchDownl
 		totalBytes atomic.Int64
 	)
 
+	logf := func(format string, args ...any) {
+		if opts.Output != nil {
+			mu.Lock()
+			fmt.Fprintf(opts.Output, format, args...)
+			mu.Unlock()
+		}
+	}
+
 	for _, ep := range opts.Episodes {
 		if ctx.Err() != nil {
 			break
@@ -72,9 +80,7 @@ func BatchDownload(ctx context.Context, httpClient *http.Client, opts BatchDownl
 
 			if episode.EnclosureURL == "" {
 				n := completed.Add(1)
-				if opts.Output != nil {
-					fmt.Fprintf(opts.Output, "[%d/%d] Skipped %q (no enclosure URL)\n", n, total, episode.Title)
-				}
+				logf("[%d/%d] Skipped %q (no enclosure URL)\n", n, total, episode.Title)
 				return
 			}
 
@@ -88,9 +94,7 @@ func BatchDownload(ctx context.Context, httpClient *http.Client, opts BatchDownl
 				mu.Lock()
 				errors = append(errors, fmt.Errorf("episode %q: %w", episode.Title, err))
 				mu.Unlock()
-				if opts.Output != nil {
-					fmt.Fprintf(opts.Output, "[%d/%d] Failed %q: %v\n", n, total, episode.Title, err)
-				}
+				logf("[%d/%d] Failed %q: %v\n", n, total, episode.Title, err)
 				return
 			}
 
@@ -101,9 +105,7 @@ func BatchDownload(ctx context.Context, httpClient *http.Client, opts BatchDownl
 			}
 			totalBytes.Add(size)
 
-			if opts.Output != nil {
-				fmt.Fprintf(opts.Output, "[%d/%d] Downloaded %q (%s)\n", n, total, episode.Title, FormatBytes(size))
-			}
+			logf("[%d/%d] Downloaded %q (%s)\n", n, total, episode.Title, FormatBytes(size))
 		}(ep)
 	}
 
